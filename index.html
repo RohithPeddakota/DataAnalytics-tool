@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexalytics | Data Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="ph-fill ph-hexagon"></i>
+                <span>Nexalytics</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tooltip="Dashboard">
+                    <i class="ph ph-squares-four"></i>
+                </a>
+                <a href="#" class="nav-item" data-tooltip="Analytics">
+                    <i class="ph ph-chart-line-up"></i>
+                </a>
+                <a href="#table-section" class="nav-item" data-tooltip="Data View">
+                    <i class="ph ph-table"></i>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+                    <i class="ph ph-sun"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="topbar">
+                <div class="header-left">
+                    <h1>Dashboard Overview</h1>
+                    <p class="subtitle" id="datasetName">Sample Dataset: E-Commerce Sales</p>
+                </div>
+                <div class="header-right">
+                    <label for="csvUpload" class="btn btn-primary upload-btn">
+                        <i class="ph ph-upload-simple"></i>
+                        Import CSV
+                    </label>
+                    <input type="file" id="csvUpload" accept=".csv" style="display: none;">
+                    
+                    <button id="exportDataBtn" class="btn btn-secondary">
+                        <i class="ph ph-download-simple"></i>
+                        Export Data
+                    </button>
+                    <button id="downloadChartsBtn" class="btn btn-secondary">
+                        <i class="ph ph-image"></i>
+                        Save Dashboard
+                    </button>
+                </div>
+            </header>
+
+            <!-- Controls (Filters & Search) -->
+            <section class="controls-section">
+                <div class="search-box">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="globalSearch" placeholder="Search across data...">
+                </div>
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="metricSelect">Metric Column:</label>
+                        <select id="metricSelect">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="categorySelect">Category Column:</label>
+                        <select id="categorySelect">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPI Cards -->
+            <section class="kpi-grid">
+                <div class="kpi-card glass">
+                    <div class="kpi-icon"><i class="ph ph-list-numbers"></i></div>
+                    <div class="kpi-info">
+                        <h3>Total Rows</h3>
+                        <p id="kpi-rows" class="kpi-value">0</p>
+                    </div>
+                </div>
+                <div class="kpi-card glass">
+                    <div class="kpi-icon"><i class="ph ph-sigma"></i></div>
+                    <div class="kpi-info">
+                        <h3>Total Sum</h3>
+                        <p id="kpi-sum" class="kpi-value">0.00</p>
+                    </div>
+                </div>
+                <div class="kpi-card glass">
+                    <div class="kpi-icon"><i class="ph ph-math-operations"></i></div>
+                    <div class="kpi-info">
+                        <h3>Average</h3>
+                        <p id="kpi-avg" class="kpi-value">0.00</p>
+                    </div>
+                </div>
+                <div class="kpi-card glass">
+                    <div class="kpi-icon"><i class="ph ph-trend-up"></i></div>
+                    <div class="kpi-info">
+                        <h3>Maximum</h3>
+                        <p id="kpi-max" class="kpi-value">0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Grid -->
+            <section class="charts-grid" id="chartsContainer">
+                <div class="chart-card glass">
+                    <div class="chart-header">
+                        <h3>Distribution by Category (Bar)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass">
+                    <div class="chart-header">
+                        <h3>Trend Analysis (Line)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass">
+                    <div class="chart-header">
+                        <h3>Proportional Share (Pie)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass">
+                    <div class="chart-header">
+                        <h3>Segment Focus (Doughnut)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Table -->
+            <section class="table-section glass" id="table-section">
+                <div class="table-header">
+                    <h3>Raw Data View</h3>
+                    <div class="pagination-controls">
+                        <button id="prevPageBtn" class="icon-btn" disabled><i class="ph ph-caret-left"></i></button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextPageBtn" class="icon-btn" disabled><i class="ph ph-caret-right"></i></button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="dataTable">
+                        <thead>
+                            <tr id="tableHeadRow">
+                                <!-- Dynamic Headers -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Main Logic -->
+    <script src="main.js"></script>
+</body>
+</html>
